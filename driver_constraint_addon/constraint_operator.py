@@ -38,7 +38,9 @@ def get_prop_object(self,context,prop_name,obj):
         shape_keys = obj.data.shape_keys
                     
     if mat != None:
-        tex = mat.active_texture
+        tex = mat.paint_active_slot #sav active_texture
+
+
         
     
     ### return if property is found in modifier
@@ -146,7 +148,7 @@ class CreateDriverConstraint(bpy.types.Operator):
         if len(context.selected_objects) > 1:
             obj = None
             for obj2 in context.selected_objects:
-                if obj2 != context.scene.objects.active:
+                if obj2 != context.view_layer.objects.active:
                     obj = obj2
                     break
         else:
@@ -171,7 +173,7 @@ class CreateDriverConstraint(bpy.types.Operator):
             if len(context.selected_objects) > 1:
                 obj = None
                 for obj2 in context.selected_objects:
-                    if obj2 != context.scene.objects.active:
+                    if obj2 != context.view_layer.objects.active:
                         obj = obj2
                         break
             else:
@@ -207,7 +209,7 @@ class CreateDriverConstraint(bpy.types.Operator):
         if len(context.selected_objects) > 1:
             obj = None
             for obj2 in context.selected_objects:
-                if obj2 != context.scene.objects.active:
+                if obj2 != context.view_layer.objects.active:
                     obj = obj2
                     break
         else:
@@ -251,21 +253,21 @@ class CreateDriverConstraint(bpy.types.Operator):
         self.action_frame_end = get_action_length(action)
     
     
-    mode = bpy.props.EnumProperty(name="Operator Mode",items=(("DRIVER","Driver","Driver"),("ACTION","Action","Action")))
+    mode : bpy.props.EnumProperty(name="Operator Mode",items=(("DRIVER","Driver","Driver"),("ACTION","Action","Action")))
         
-    property_type = bpy.props.EnumProperty(name = "Mode",items=get_property_type_items, description="Set the space the bone is transformed in. Local Space recommended.")
+    property_type : bpy.props.EnumProperty(name = "Mode",items=get_property_type_items, description="Set the space the bone is transformed in. Local Space recommended.")
     
-    prop_data_path = bpy.props.StringProperty(name="Property Data Path", default="",update=search_for_prop)
+    prop_data_path : bpy.props.StringProperty(name="Property Data Path", default="",update=search_for_prop)
     
-    shape_name = bpy.props.EnumProperty(items = get_shapes, name = "Shape", description="Select the shape you want to add a driver to.")
-    get_limits_auto = bpy.props.BoolProperty(name = "Get Limits",default=True,description="This will set the limits based on the bone location/rotation/scale automatically.")
+    shape_name : bpy.props.EnumProperty(items = get_shapes, name = "Shape", description="Select the shape you want to add a driver to.")
+    get_limits_auto : bpy.props.BoolProperty(name = "Get Limits",default=True,description="This will set the limits based on the bone location/rotation/scale automatically.")
     
     
     int_type_values = []
     int_type_values.append(("LINEAR","Linear","Linear","IPO_LINEAR",0))
     int_type_values.append(("CONSTANT","Constant","Constant","IPO_CONSTANT",1))
     int_type_values.append(("BEZIER","Bezier","Bezier","IPO_BEZIER",2))
-    interpolation_type = bpy.props.EnumProperty(name = "Interpolation Type",items=int_type_values, description="Defines the transition from one value to another.")
+    interpolation_type : bpy.props.EnumProperty(name = "Interpolation Type",items=int_type_values, description="Defines the transition from one value to another.")
     
     type_values = []
     type_values.append(("LOC_X","X Location","X Location","None",0))
@@ -277,30 +279,30 @@ class CreateDriverConstraint(bpy.types.Operator):
     type_values.append(("SCALE_X","X Scale","X Scale","None",6))
     type_values.append(("SCALE_Y","Y Scale","Y Scale","None",7))
     type_values.append(("SCALE_Z","Z Scale","Z Scale","None",8))
-    type = bpy.props.EnumProperty(name = "Type",items=type_values, description="Set the type you want to be used as input to drive the shapekey.")
+    type : bpy.props.EnumProperty(name = "Type",items=type_values, description="Set the type you want to be used as input to drive the shapekey.")
     
-    action = bpy.props.EnumProperty(name="Action",items=get_actions,description="Choose Action that will be driven by Bone",update=get_animation_length)
-    action_constraint = bpy.props.EnumProperty(name="Action",items=get_action_constraints,description="Choose Action Constraint that will be deleted for selected bones.")
-    action_mode = bpy.props.EnumProperty(name="Action",items=(("ADD_CONSTRAINT","Add Constraints","Add Constraints"),("DELETE_CONSTRAINT","Delete Constraints","Delete Constraints")),description="Delete or Add Action Constraints for selected bones.")
+    action : bpy.props.EnumProperty(name="Action",items=get_actions,description="Choose Action that will be driven by Bone",update=get_animation_length)
+    action_constraint : bpy.props.EnumProperty(name="Action",items=get_action_constraints,description="Choose Action Constraint that will be deleted for selected bones.")
+    action_mode : bpy.props.EnumProperty(name="Action",items=(("ADD_CONSTRAINT","Add Constraints","Add Constraints"),("DELETE_CONSTRAINT","Delete Constraints","Delete Constraints")),description="Delete or Add Action Constraints for selected bones.")
     
     space_values = []
     space_values.append(("LOCAL_SPACE","Local Space","Local Space","None",0))
     space_values.append(("TRANSFORM_SPACE","Transform Space","Transform Space","None",1))
     space_values.append(("WORLD_SPACE","World Space","World Space","None",2))
-    space = bpy.props.EnumProperty(name = "Space",items=space_values, description="Set the space the bone is transformed in. Local Space recommended.")
+    space : bpy.props.EnumProperty(name = "Space",items=space_values, description="Set the space the bone is transformed in. Local Space recommended.")
     
-    min_value = bpy.props.FloatProperty(name = "Min Value",default=0.0, description="That value is used as 0.0 value for the shapekey.")
-    max_value = bpy.props.FloatProperty(name = "Max Value",default=1.0, description="That value is used as 1.0 value for the shapekey.")
+    min_value : bpy.props.FloatProperty(name = "Min Value",default=0.0, description="That value is used as 0.0 value for the shapekey.")
+    max_value : bpy.props.FloatProperty(name = "Max Value",default=1.0, description="That value is used as 1.0 value for the shapekey.")
     
-    action_frame_start = bpy.props.IntProperty(name = "Min Value",default=0, description="Value where the animations is starting.")
-    action_frame_end = bpy.props.IntProperty(name = "Max Value",default=10, description="Value where the animation is ending.")
+    action_frame_start : bpy.props.IntProperty(name = "Min Value",default=0, description="Value where the animations is starting.")
+    action_frame_end : bpy.props.IntProperty(name = "Max Value",default=10, description="Value where the animation is ending.")
     
-    prop_min_value = bpy.props.FloatProperty(name = "Min Value",default=0.0, description="That value is used as 0.0 value for the Property.")
-    prop_max_value = bpy.props.FloatProperty(name = "Max Value",default=1.0, description="That value is used as 1.0 value for the Property.")
-    flip_driver_limits = bpy.props.BoolProperty(name = "Flip Driver Limits",default=False,description="This Bool Property flips the Driver Limits.",update=driver_limits_flip)
-    flip_property_limits = bpy.props.BoolProperty(name = "Flip Property Limits",default=False,description="This Bool Property flips the Property Limits.",update=property_limits_flip)
+    prop_min_value : bpy.props.FloatProperty(name = "Min Value",default=0.0, description="That value is used as 0.0 value for the Property.")
+    prop_max_value : bpy.props.FloatProperty(name = "Max Value",default=1.0, description="That value is used as 1.0 value for the Property.")
+    flip_driver_limits : bpy.props.BoolProperty(name = "Flip Driver Limits",default=False,description="This Bool Property flips the Driver Limits.",update=driver_limits_flip)
+    flip_property_limits : bpy.props.BoolProperty(name = "Flip Property Limits",default=False,description="This Bool Property flips the Property Limits.",update=property_limits_flip)
     
-    set_driver_limit_constraint = bpy.props.BoolProperty(name = "Set Driver limit Constraint",default=False,description="Set Driver Limit Constraint with given settings.")
+    set_driver_limit_constraint : bpy.props.BoolProperty(name = "Set Driver limit Constraint",default=False,description="Set Driver Limit Constraint with given settings.")
     driver = None
     limit_type = None   
     
@@ -519,7 +521,7 @@ class CreateDriverConstraint(bpy.types.Operator):
     def execute(self, context):
         wm = context.window_manager
         context = bpy.context
-        scene = context.scene
+        scene = context.view_layer
         active_object = context.active_object
         
         if self.mode == "DRIVER":
@@ -533,7 +535,7 @@ class CreateDriverConstraint(bpy.types.Operator):
         if len(context.selected_objects) > 1:
             obj = None
             for obj2 in context.selected_objects:
-                if obj2 != context.scene.objects.active:
+                if obj2 != context.view_layer.objects.active:
                     obj = obj2
                     break
         else:
@@ -541,7 +543,7 @@ class CreateDriverConstraint(bpy.types.Operator):
         
         driver_found = False
         for obj in context.selected_objects:
-            if obj != context.scene.objects.active or len(context.selected_objects) == 1:
+            if obj != context.view_layer.objects.active or len(context.selected_objects) == 1:
                 if get_prop_object(self,context,self.prop_data_path,obj) != None:
                     prop_type = get_prop_object(self,context,self.prop_data_path,obj)[1]
                     data = get_prop_object(self,context,self.prop_data_path,obj)[0]
@@ -688,7 +690,7 @@ class CreateDriverConstraint(bpy.types.Operator):
         if len(context.selected_objects) > 1:
             obj = None
             for obj2 in context.selected_objects:
-                if obj2 != context.scene.objects.active:
+                if obj2 != context.view_layer.objects.active:
                     obj = obj2
                     break
         else:
@@ -710,3 +712,5 @@ class CreateDriverConstraint(bpy.types.Operator):
             self.action_frame_end = get_action_length(action)
                 
         return wm.invoke_props_dialog(self)
+
+bpy.utils.register_class(CreateDriverConstraint)
